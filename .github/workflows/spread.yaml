@@ -106,9 +106,7 @@ jobs:
         run: |
           set -ex
           ln -s "${{ env.main-branch-path }}/.github/scripts/test-coverage/coverage-report" coverage-report
-          ls
-          ls $MANIFESTS_EXPORT_DIR
-          ./coverage-report slices-in-changed-files.txt $MANIFESTS_EXPORT_DIR > coverage-report_${{ matrix.runner.name }}.json
+          ./coverage-report slices-in-changed-files.txt $MANIFESTS_EXPORT_DIR/manifests > coverage-report_${{ matrix.runner.name }}.json
       
       - name: Upload report
         if: ${{ steps.run-spread.conclusion == 'success' }}
