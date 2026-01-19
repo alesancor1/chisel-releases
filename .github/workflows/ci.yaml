@@ -22,7 +22,7 @@ jobs:
 
   integration-tests:
     name: Integration tests
-    uses: alesancor1/chisel-releases/.github/workflows/spread.yaml@main
+    uses: alesancor1/chisel-releases/.github/workflows/spread.yaml@ROCKS-2208/coverage
 
   # removed-slices:
   #   name: Removed slices
