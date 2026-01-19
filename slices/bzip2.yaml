@@ -4,6 +4,7 @@ essential:
   - bzip2_copyright
 
 slices:
+  # Test
   bins:
     essential:
       - libbz2-1.0_libs
