@@ -22,9 +22,9 @@ function main {
         echo "Average Total Coverage: ${average}%"
         echo ""
         for file in "$1"/*.json; do
-            arch=$(basename "$file" | sed -E 's/integration-test-coverage-report_(.*)\.json/\1/')
-            echo "#### Arch: ${arch}"
+            arch=$(basename "$file" | sed -E 's/coverage-report_(.*)\.json/\1/')
             echo "---"
+            echo "#### Arch: ${arch}"
             json_to_md "$file"
         done
         
