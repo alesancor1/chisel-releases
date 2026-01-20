@@ -77,42 +77,60 @@ function main {
         shift
     done
 
+    # Ensure exactly one of dir or file is provided
+    if [[ -n "$dir" && -n "$file" ]]; then
+        echo "Error: Specify either --dir or --file, not both." >&2
+        exit 1
+    elif [[ -z "$dir" && -z "$file" ]]; then
+        echo "Error: You must specify either --dir or --file." >&2
+        exit 1
+    fi
+
     # Process directory
-    if [ -d "$dir" ]; then
+    if [[ -n "$dir" ]]; then
+        if [[ ! -d "$dir" ]]; then
+            echo "Directory not found: $dir" >&2
+            exit 1
+        fi
+
         total=0
         count=0
+
         for file in "$dir"/*.json; do
-            file_total=$(jq -r '.total_coverage' <$file)
+            [[ -e "$file" ]] || continue
+            file_total=$(jq -r '.total_coverage' < "$file")
             total=$(echo "$total + $file_total" | bc)
             count=$((count + 1))
         done
-        if [ "$count" -gt 0 ]; then
+
+        if (( count > 0 )); then
             average=$(echo "scale=2; $total / $count" | bc)
         else
             average=0
         fi
+
         echo "Average Total Coverage: ${average}%"
         echo ""
+
         for file in "$dir"/*.json; do
+            [[ -e "$file" ]] || continue
             arch=$(basename "$file" | sed -E 's/coverage-report_(.*)\.json/\1/')
             echo "---"
             echo "#### Arch: ${arch}"
             json_to_md "$file"
         done
-    else
-        echo "Directory not found: $dir" >&2
-        exit 1
-    fi
-    
+
     # Process single file
-    if [ -f "$file" ]; then
-        total=$(echo "$file" | jq -r '.total_coverage')
+    elif [[ -n "$file" ]]; then
+        if [[ ! -f "$file" ]]; then
+            echo "File not found: $file" >&2
+            exit 1
+        fi
+
+        total=$(jq -r '.total_coverage' < "$file")
         echo "Total Coverage: ${total}%"
         echo ""
         json_to_md "$file"
-    else
-        echo "File not found: $file" >&2
-        exit 1
     fi
 }
 
