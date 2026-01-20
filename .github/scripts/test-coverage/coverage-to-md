@@ -83,7 +83,7 @@ function main {
         count=0
         for file in "$dir"/*.json; do
             file_total=$(jq -r '.total_coverage' <$file)
-            total=$((total + file_total))
+            total=$(echo "$total + $file_total" | bc)
             count=$((count + 1))
         done
         if [ "$count" -gt 0 ]; then
