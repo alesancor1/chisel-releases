@@ -57,6 +57,9 @@ function json_to_md {
 function main {
     echo "### Test Coverage"
 
+    local dir=""
+    local file=""
+
     # Read arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
