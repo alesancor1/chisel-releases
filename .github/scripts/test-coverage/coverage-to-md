@@ -25,8 +25,10 @@ set -euo pipefail
 #   $1  JSON file path
 #
 function json_to_md {
+    json=$(cat "$1")
+
     local jq_filter='.tests | to_entries[] | "\(.key) \(.value.coverage) \(.value.missing | length) \(.value.missing | join(" "))"'
-    jq -r "$jq_filter" < $1 | while read -r pkg coverage count missing; do
+    echo "$json" | jq -r "$jq_filter" | while read -r pkg coverage count missing; do
     
     echo "<details>"
     
