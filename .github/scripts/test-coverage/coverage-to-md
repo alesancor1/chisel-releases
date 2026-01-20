@@ -77,15 +77,6 @@ function main {
         shift
     done
 
-    # Ensure exactly one of dir or file is provided
-    if [[ -n "$dir" && -n "$file" ]]; then
-        echo "Error: Specify either --dir or --file, not both." >&2
-        exit 1
-    elif [[ -z "$dir" && -z "$file" ]]; then
-        echo "Error: You must specify either --dir or --file." >&2
-        exit 1
-    fi
-
     # Process directory
     if [[ -n "$dir" ]]; then
         if [[ ! -d "$dir" ]]; then
