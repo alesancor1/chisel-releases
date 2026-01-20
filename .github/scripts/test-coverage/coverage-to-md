@@ -26,7 +26,7 @@ set -euo pipefail
 #
 function json_to_md {
     local jq_filter='.tests | to_entries[] | "\(.key) \(.value.coverage) \(.value.missing | length) \(.value.missing | join(" "))"'
-    jq -r "$jq_filter" < $1 | while read -r pkg coverage count missing; do
+    jq -r "$jq_filter" $1 | while read -r pkg coverage count missing; do
     
     echo "<details>"
     
@@ -97,9 +97,6 @@ function main {
             arch=$(basename "$file" | sed -E 's/coverage-report_(.*)\.json/\1/')
             echo "---"
             echo "#### Arch: ${arch}"
-
-            echo "----------------"
-            cat $file
             json_to_md "$file"
         done
     else
