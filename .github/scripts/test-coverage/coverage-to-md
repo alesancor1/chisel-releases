@@ -93,7 +93,7 @@ function main {
         fi
         echo "Average Total Coverage: ${average}%"
         echo ""
-        for file in "$1"/*.json; do
+        for file in "$dir"/*.json; do
             arch=$(basename "$file" | sed -E 's/coverage-report_(.*)\.json/\1/')
             echo "---"
             echo "#### Arch: ${arch}"
