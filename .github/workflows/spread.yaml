@@ -152,7 +152,7 @@ jobs:
     
       - name: Upload comment to PR
         if: ${{ github.event.pull_request }}
-        uses: canonical/chisel-releases/.github/actions/upload-pr-comment@main
+        uses: alesancor1/chisel-releases/.github/actions/upload-pr-comment@main
         with:
           message-path: coverage-summary.md
           message-id: coverage-summary
