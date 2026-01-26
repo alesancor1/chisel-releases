@@ -111,7 +111,7 @@ jobs:
         id: json-coverage-report
         run: |
           ln -s "${{ env.main-branch-path }}/.github/scripts/test-coverage/coverage-report" coverage-report
-          ./coverage-report installed-slices.txt committed-slices.txt > report.json
+          ./coverage-report installed-slices.txt committed-slices.txt > coverage-report_${{ matrix.runner.name }}.json
 
       - name: Upload report
         if: ${{ steps.run-spread.conclusion == 'success' }}
