@@ -100,7 +100,7 @@ jobs:
         id: json-coverage-report
         run: |
           awk 'FNR==1{print "---"}{print}' "${{ steps.changed-slices.outputs.slices_files }}" > committed-slices.yaml
-          find manifests/ -type f -name "*.wall" -exec zstdcat {} \; > installed-slices.wall
+          find "$MANIFESTS_EXPORT_DIR" -type f -name "*.wall" -exec zstdcat {} \; > installed-slices.wall
 
           ln -s "${{ env.main-branch-path }}/.github/scripts/test-coverage/coverage-report" coverage-report
           ./coverage-report installed-slices.wall committed-slices.yaml > coverage-report_${{ matrix.runner.name }}.json
