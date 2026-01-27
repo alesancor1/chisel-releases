@@ -3,18 +3,18 @@
 # coverage-report - Generate a coverage report for changed slices
 #
 # Usage:
-#   coverage-report <installed-slices-file> <committed-slices-file>
+#   coverage-report <installed-slices-manifest> <committed-slices-yaml>
 #
 # Arguments:
-#   installed-slices-file    Text file with list of installed slices (one per line)
-#   committed-slices-file    Text file with list of committed slices (one per line)
+#   installed-slices-manifest    json wall manifest of installed slices
+#   committed-slices-yaml        combined yaml of committed SDFs
 #
 # Exit codes:
 #   0   Success
 #   1   General error
 #
 # Examples:
-#   coverage-report installed_slices.txt committed_slices.txt > coverage_report.json
+#   coverage-report installed_slices.wall committed_slices.yaml > coverage_report.json
 #
 # spellchecker: ignore zstdcat argjson
 
@@ -29,16 +29,6 @@ function log {
     if [ "${DEBUG:-0}" -eq 1 ]; then
         echo "[$(date --iso-8601=seconds)] $*" >&2
     fi
-}
-
-# intersection - Compute intersection of two space-separated lists
-#
-# Arguments:
-#   $1  First space-separated list
-#   $2  Second space-separated list
-#
-function intersection {
-    comm -12 <(echo "$1" | tr ' ' '\n' | sort -u) <(echo "$2" | tr ' ' '\n' | sort -u)
 }
 
 # difference - Compute difference of two space-separated lists
@@ -70,13 +60,15 @@ function count {
 function main {
   
     if [ "$#" -ne 2 ]; then
-        echo "Usage: $0 <installed-slices-file> <committed-slices-file>" >&2
+        echo "Usage: $0 <installed-slices-manifest> <committed-slices-yaml>" >&2
         exit 1
     fi
 
-    local installed_slices=$(cat $1)
-    local committed_slices=$(cat $2)
+    local installed_slices=$(zstdcat $1 | jq -r 'select(.kind=="slice") | .name' | sort -u)
+    local committed_slices=$(yq ea -r '.package as $pkg | .slices | keys | .[] | "\($pkg)_\(.)"' $2 | sort -u)
+
     local committed_packages="$(awk -F_ '{print $1}' <<< "$committed_slices" | sort -u)"
+    log "Packages to check: $committed_packages"
 
     local pkg_coverage_json="{}"
     local total_committed_slices=0
@@ -87,7 +79,10 @@ function main {
         local installed_pkg_slices=$(grep "^${pkg}_" <<< "$installed_slices")
 
         local n_committed_pkg_slices=$(count "$committed_pkg_slices")
+        log "Committed slices for package $pkg: $n_committed_pkg_slices"
+
         local n_installed_pkg_slices=$(count "$installed_pkg_slices")
+        log "Installed slices for package $pkg: $n_installed_pkg_slices"
 
         # Calculate pkg coverage
         local pkg_coverage="0.00"
@@ -99,6 +94,7 @@ function main {
 
         # Get slices missing tests
         local missing_slices=$(difference "$committed_pkg_slices" "$installed_pkg_slices")
+        log "Untested slices for package $pkg: $missing_slices"
 
         # Build the json body
         local missing_slices_json="[]"
